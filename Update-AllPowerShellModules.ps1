@@ -5,10 +5,10 @@
 Write-Host -ForegroundColor cyan 'Define PowerShell to use TLS1.2 in this session, needed since 1st April 2020 (https://devblogs.microsoft.com/powershell/powershell-gallery-tls-support/)'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-#>
+# if needed
 # Register PSGallery PSprovider and set as Trusted source
-Register-PSRepository -Default -ErrorAction SilentlyContinue
-Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
+#Register-PSRepository -Default -ErrorAction SilentlyContinue
+#Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
 
 $modules = Get-InstalledModule
 
@@ -32,7 +32,7 @@ foreach ($module in $modules.Name) {
         }
     }
     elseif ($moduleInfos.Version -eq $currentVersion) {
-        Write-Host -ForegroundColor Green "$($moduleInfos.Name) already installed in the last version"
+        Write-Host -ForegroundColor Green "$($moduleInfos.Name) already installed in the latest version ($currentVersion published on $($moduleInfos.PublishedDate))"
     }
     elseif ($currentVersion.count -gt 1) {
         Write-Warning "$module is installed in $($currentVersion.count) versions (versions: $currentVersion)"
