@@ -22,7 +22,7 @@ foreach ($module in $modules.Name) {
     $moduleInfos = Find-Module -Name $module
 	
     if ($null -eq $currentVersion) {
-        Write-Host -ForegroundColor Cyan "Install from PowerShellGallery : $($moduleInfos.Name) - $($moduleInfos.Version) published on $($moduleInfos.PublishedDate)"  
+        Write-Host -ForegroundColor Cyan "Install from PowerShellGallery : $($moduleInfos.Name) - $($moduleInfos.Version). Release date:$($moduleInfos.PublishedDate)"  
 		
         try {
             Install-Module -Name $module -Force
@@ -32,7 +32,7 @@ foreach ($module in $modules.Name) {
         }
     }
     elseif ($moduleInfos.Version -eq $currentVersion) {
-        Write-Host -ForegroundColor Green "$($moduleInfos.Name) already installed in the latest version ($currentVersion published on $($moduleInfos.PublishedDate))"
+        Write-Host -ForegroundColor Green "$($moduleInfos.Name) already installed in the latest version ($currentVersion. Release date: $($moduleInfos.PublishedDate))"
     }
     elseif ($currentVersion.count -gt 1) {
         Write-Warning "$module is installed in $($currentVersion.count) versions (versions: $currentVersion)"
@@ -45,7 +45,7 @@ foreach ($module in $modules.Name) {
             Write-Host -ForegroundColor red "$_.Exception.Message"
         }
         
-        Write-Host -ForegroundColor Cyan "Install from PowerShellGallery : $($moduleInfos.Name) - $($moduleInfos.Version) published on $($moduleInfos.PublishedDate)"  
+        Write-Host -ForegroundColor Cyan "Install from PowerShellGallery : $($moduleInfos.Name) - $($moduleInfos.Version). Release date:$($moduleInfos.PublishedDate)"  
     
         try {
             Install-Module -Name $module -Force
@@ -55,7 +55,7 @@ foreach ($module in $modules.Name) {
         }
     }
     else {       
-        Write-Host -ForegroundColor Cyan "Update from PowerShellGallery from $currentVersion to $($moduleInfos.Name) - $($moduleInfos.Version) published on $($moduleInfos.PublishedDate)" 
+        Write-Host -ForegroundColor Cyan "Update from PowerShellGallery from $currentVersion to $($moduleInfos.Name) - $($moduleInfos.Version). Release date:$($moduleInfos.PublishedDate)" 
         try {
             Update-Module -Name $module -Force
         }
