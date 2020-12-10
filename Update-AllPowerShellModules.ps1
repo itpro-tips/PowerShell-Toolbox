@@ -28,7 +28,7 @@ foreach ($module in $modules.Name) {
     $moduleInfos = Find-Module -Name $module
 	
     if ($null -eq $currentVersion) {
-        Write-Host -ForegroundColor Cyan "Install from PowerShellGallery : $($moduleInfos.Name) - $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)"  
+        Write-Host -ForegroundColor Cyan "$($moduleInfos.Name) - Install from PowerShellGallery version $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)"  
 		
         try {
             Install-Module -Name $module -Force
@@ -51,7 +51,7 @@ foreach ($module in $modules.Name) {
             Write-Host -ForegroundColor red "$_.Exception.Message"
         }
         
-        Write-Host -ForegroundColor Cyan "Install from PowerShellGallery : $($moduleInfos.Name) - $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)"  
+        Write-Host -ForegroundColor Cyan "$($moduleInfos.Name) - Install from PowerShellGallery version $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)"  
     
         try {
             Install-Module -Name $module -Force
@@ -61,7 +61,7 @@ foreach ($module in $modules.Name) {
         }
     }
     else {       
-        Write-Host -ForegroundColor Cyan "Update from PowerShellGallery from $currentVersion to $($moduleInfos.Name) - $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)" 
+        Write-Host -ForegroundColor Cyan "$($moduleInfos.Name) - Update from PowerShellGallery from version $currentVersion to $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)" 
         try {
             Update-Module -Name $module -Force
         }
