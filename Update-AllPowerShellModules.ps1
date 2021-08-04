@@ -1,10 +1,10 @@
 # https://itpro-tips.com/2020/update-all-powershell-modules-at-once/
 # https://itpro-tips.com/2020/mettre-a-jour-tous-les-modules-powershell-en-une-fois/
 
-# This script provide informations about the module version (current and the latest available on PowerShell Gallery) and update to the latest version
+# This script provides informations about the module version (current and the latest available on PowerShell Gallery) and update to the latest version
 # If you have a module with two or more versions, the script delete them and reinstall only the latest.
 
-# PowerShell 5.0 pour PowerShell Gallery  
+# PowerShell 5.0 for PowerShell Gallery  
 #Requires -Version 5.0
 #Requires -RunAsAdministrator
 
@@ -13,8 +13,8 @@ Write-Host -ForegroundColor cyan 'Define PowerShell to use TLS1.2 in this sessio
 
 # if needed
 # Register PSGallery PSprovider and set as Trusted source
-#Register-PSRepository -Default -ErrorAction SilentlyContinue
-#Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
+# Register-PSRepository -Default -ErrorAction SilentlyContinue
+# Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
 
 $modules = Get-InstalledModule
 
