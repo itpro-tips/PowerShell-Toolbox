@@ -11,7 +11,7 @@
 Write-Host -ForegroundColor cyan 'Define PowerShell to use TLS1.2 in this session, needed since 1st April 2020 (https://devblogs.microsoft.com/powershell/powershell-gallery-tls-support/)'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
-# if needed
+# if needed, register PSGallery
 # Register PSGallery PSprovider and set as Trusted source
 # Register-PSRepository -Default -ErrorAction SilentlyContinue
 # Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
