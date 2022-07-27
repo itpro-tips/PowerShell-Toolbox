@@ -58,7 +58,6 @@ foreach ($module in $modules.Name) {
                 Remove-Module $module -ErrorAction SilentlyContinue
                 Uninstall-Module $oldVersion -Force 
             }
-            
         }
         catch {
             Write-Host -ForegroundColor red "$_.Exception.Message"
@@ -74,6 +73,9 @@ foreach ($module in $modules.Name) {
                 Write-Host -ForegroundColor red "$_.Exception.Message"
             }
         }
+    }
+    elseif($currentVersion -gt $moduleInfos.Version){
+        Write-Host -ForegroundColor Yellow "$($moduleInfos.Name) - the current version $currentVersion is newer than the version on PowerShell Gallery $($moduleInfos.Version) (Release date: $($moduleInfos.PublishedDate)). Update skipped."
     }
     else {       
         Write-Host -ForegroundColor Cyan "$($moduleInfos.Name) - Update from PowerShellGallery from version $currentVersion to $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)" 
