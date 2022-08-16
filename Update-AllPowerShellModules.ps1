@@ -75,10 +75,7 @@ foreach ($module in $modules.Name) {
         }
     }
     # https://invoke-thebrain.com/2018/12/comparing-version-numbers-powershell/
-    elseif ([version]$currentVersion -gt [version]$moduleInfos.Version) {
-        Write-Host -ForegroundColor Yellow "$($moduleInfos.Name) - the current version $currentVersion is newer than the version on PowerShell Gallery $($moduleInfos.Version) (Release date: $($moduleInfos.PublishedDate)). Update skipped."
-    }
-    else {       
+    elseif ([version]$currentVersion -gt [version]$moduleInfos.Version) {      
         Write-Host -ForegroundColor Cyan "$($moduleInfos.Name) - Update from PowerShellGallery from version $currentVersion to $($moduleInfos.Version). Release date: $($moduleInfos.PublishedDate)" 
         try {
             Update-Module -Name $module -Force
