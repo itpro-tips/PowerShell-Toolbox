@@ -12,14 +12,14 @@ param (
 <#
 /!\/!\/!\ PLEASE READ /!\/!\/!\
 
-/!\     If you look for a quick way to update, please keep in mind Microsoft has a built-in command to update ALL the PowerShell modules installed:
+/!\     If you look for a quick way to update, please keep in mind Microsoft has a built-in CMDlzt to update ALL the PowerShell modules installed:
 /!\     Update-Module [-Verbose]
 
-/!\     This script is intended as a replacement of the Update-Module::
+/!\     This script is intended as a replacement of the Update-Module:
 /!\     - to provide more human readable output than the -Verbose option of Update-Module
-/!\     - to force install with -SkipPublisherCheck (Authenticode change) because Update-Module have not this option
+/!\     - to force install with -SkipPublisherCheck (Authenticode change) because Update-Module has not this option
 /!\     - to exclude some modules from the update process
-/!\     - to remove older versions because Update-Module does not remove older versions (Upadte-Module only install a new version in the $env:PSModulePath\<moduleName>)
+/!\     - to remove older versions because Update-Module does not remove older versions (it only installs a new version in the $env:PSModulePath\<moduleName> and keep the old module)
 
 This script provides informations about the module version (current and the latest available on PowerShell Gallery) and update to the latest version
 If you have a module with two or more versions, the script delete them and reinstall only the latest.
