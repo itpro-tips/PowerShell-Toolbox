@@ -51,7 +51,7 @@ function Remove-OldPowerShellModules {
         foreach ($oldVersion in $oldVersions) {
             Write-Host -ForegroundColor Cyan "$ModuleName - Uninstall previous version ($($oldVersion.Version))"
             Remove-Module $ModuleName -ErrorAction SilentlyContinue
-            Uninstall-Module $oldVersion -Force 
+            Uninstall-Module $oldVersion -Force  -ErrorAction Stop
         }
     }
     catch {
@@ -84,7 +84,7 @@ foreach ($module in $modules.Name) {
     }
 	
     try {
-        $moduleGalleryInfo = Find-Module -Name $module
+        $moduleGalleryInfo = Find-Module -Name $module -ErrorAction Stop
     }
     catch {
         Write-Warning "$module not found in the PowerShell Gallery. $($_.Exception.Message)"
@@ -94,7 +94,7 @@ foreach ($module in $modules.Name) {
         Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
 		
         try {
-            Install-Module -Name $module -Force -SkipPublisherCheck
+            Install-Module -Name $module -Force -SkipPublisherCheck -ErrorAction Stop
         }
         catch {
             Write-Warning "$module - $($_.Exception.Message)"
@@ -107,7 +107,7 @@ foreach ($module in $modules.Name) {
         Write-Host -ForegroundColor Yellow "$module is installed in $($currentVersion.count) versions (versions: $($currentVersion -join ' | '))"
         Write-Host -ForegroundColor Cyan "$module - Uninstall previous $module version(s) below the latest version ($($moduleGalleryInfo.Version))"
         
-        Remove-OldPowerShellModules -ModuleName $module
+        Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
 
         # Check again the current Version as we uninstalled some old versions
         $currentVersion = (Get-InstalledModule -Name $module).Version
@@ -116,9 +116,9 @@ foreach ($module in $modules.Name) {
             Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
     
             try {
-                Install-Module -Name $module -Force
+                Install-Module -Name $module -Force -ErrorAction Stop
 
-                Remove-OldPowerShellModules -ModuleName $module
+                Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
             }
             catch {
                 Write-Warning "$module - $($_.Exception.Message)"
