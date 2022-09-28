@@ -152,7 +152,7 @@ foreach ($module in $modules.Name) {
                     Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
                 }
                 else {
-                    Write-Warning "$module - If you want to update this module, run again with -SkipPublisherCheck switch, but please keep in mind of the security risk"
+                    Write-Warning "$module - If you want to update this module, run again with -SkipPublisherCheck switch, but please keep in mind the security risk"
                 }
             }
             else {
