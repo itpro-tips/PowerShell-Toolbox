@@ -7,7 +7,8 @@ param (
     [String[]]$ExcludedModules,
     # To include only these modules for the update process
     [String[]]$IncludedModules,
-    [switch]$SkipPublisherCheck
+    [switch]$SkipPublisherCheck,
+    [boolean]$SimulationMode = $false
 )
 <#
 /!\/!\/!\ PLEASE READ /!\/!\/!\
@@ -29,6 +30,8 @@ If you have a module with two or more versions, the script delete them and reins
 #Requires -Version 5.0
 #Requires -RunAsAdministrator
 
+$script:SimulationMode = $SimulationMode
+
 Write-Host -ForegroundColor cyan 'Define PowerShell to use TLS1.2 in this session, needed since 1st April 2020 (https://devblogs.microsoft.com/powershell/powershell-gallery-tls-support/)'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
@@ -36,6 +39,10 @@ Write-Host -ForegroundColor cyan 'Define PowerShell to use TLS1.2 in this sessio
 # Register PSGallery PSprovider and set as Trusted source
 # Register-PSRepository -Default -ErrorAction SilentlyContinue
 # Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
+
+if ($script:SimulationMode) {
+    Write-Host -ForegroundColor yellow 'Simulation mode is ON, nothing will be installed / removed / updated'
+}
 
 Write-Host -ForegroundColor Cyan 'Get all PowerShell modules'
 
@@ -50,8 +57,10 @@ function Remove-OldPowerShellModules {
 
         foreach ($oldVersion in $oldVersions) {
             Write-Host -ForegroundColor Cyan "$ModuleName - Uninstall previous version ($($oldVersion.Version))"
-            Remove-Module $ModuleName -ErrorAction SilentlyContinue
-            Uninstall-Module $oldVersion -Force  -ErrorAction Stop
+            if (-not($script:SimulationMode)) {
+                Remove-Module $ModuleName -ErrorAction SilentlyContinue
+                Uninstall-Module $oldVersion -Force  -ErrorAction Stop
+            }
         }
     }
     catch {
@@ -65,7 +74,6 @@ if ($includedModules) {
 else {
     $modules = Get-InstalledModule
 }
-
 
 foreach ($module in $modules.Name) {
     if ($ExcludedModules -contains $module) {
@@ -93,11 +101,13 @@ foreach ($module in $modules.Name) {
     if ($null -eq $currentVersion) {
         Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
 		
-        try {
-            Install-Module -Name $module -Force -SkipPublisherCheck -ErrorAction Stop
-        }
-        catch {
-            Write-Warning "$module - $($_.Exception.Message)"
+        if (-not($script:SimulationMode)) {
+            try {
+                Install-Module -Name $module -Force -SkipPublisherCheck -ErrorAction Stop
+            }
+            catch {
+                Write-Warning "$module - $($_.Exception.Message)"
+            }
         }
     }
     elseif ($moduleGalleryInfo.Version -eq $currentVersion) {
@@ -114,14 +124,15 @@ foreach ($module in $modules.Name) {
 
         if ($moduleGalleryInfo.Version -ne $currentVersion) {
             Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
-    
-            try {
-                Install-Module -Name $module -Force -ErrorAction Stop
+            if (-not($script:SimulationMode)) {
+                try {
+                    Install-Module -Name $module -Force -ErrorAction Stop
 
-                Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
-            }
-            catch {
-                Write-Warning "$module - $($_.Exception.Message)"
+                    Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
+                }
+                catch {
+                    Write-Warning "$module - $($_.Exception.Message)"
+                }
             }
         }
     }
@@ -131,32 +142,35 @@ foreach ($module in $modules.Name) {
     }
     elseif ([version]$currentVersion -lt [version]$moduleGalleryInfo.Version) {
         Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery from version $currentVersion to $($moduleGalleryInfo.Version)  Release date: $($moduleGalleryInfo.PublishedDate)" 
-        try {
-            Update-Module -Name $module -Force -ErrorAction Stop
-            Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
-        }
-        catch {
-            if ($_.Exception.Message -match 'Authenticode') {
-                Write-Host -ForegroundColor Yellow "$module - The module certificate used by the creator is either changed since the last module install or the module sign status has changed." 
+        
+        if (-not($script:SimulationMode)) {
+            try {
+                Update-Module -Name $module -Force -ErrorAction Stop
+                Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
+            }
+            catch {
+                if ($_.Exception.Message -match 'Authenticode') {
+                    Write-Host -ForegroundColor Yellow "$module - The module certificate used by the creator is either changed since the last module install or the module sign status has changed." 
                 
-                if ($SkipPublisherCheck.IsPresent) {
-                    Write-Host -ForegroundColor Cyan "$module - SkipPublisherCheck Parameter is present, so install will run without Authenticode check"
-                    Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
-                    try {
-                        Install-Module -Name $module -Force -SkipPublisherCheck
-                    }
-                    catch {
-                        Write-Warning "$module - $($_.Exception.Message)"
-                    }
+                    if ($SkipPublisherCheck.IsPresent) {
+                        Write-Host -ForegroundColor Cyan "$module - SkipPublisherCheck Parameter is present, so install will run without Authenticode check"
+                        Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
+                        try {
+                            Install-Module -Name $module -Force -SkipPublisherCheck
+                        }
+                        catch {
+                            Write-Warning "$module - $($_.Exception.Message)"
+                        }
                     
-                    Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
+                        Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
+                    }
+                    else {
+                        Write-Warning "$module - If you want to update this module, run again with -SkipPublisherCheck switch, but please keep in mind the security risk"
+                    }
                 }
                 else {
-                    Write-Warning "$module - If you want to update this module, run again with -SkipPublisherCheck switch, but please keep in mind the security risk"
+                    Write-Warning "$module - $($_.Exception.Message)"
                 }
-            }
-            else {
-                Write-Warning "$module - $($_.Exception.Message)"
             }
         }
     }
