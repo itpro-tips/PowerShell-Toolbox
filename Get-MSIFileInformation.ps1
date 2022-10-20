@@ -1,4 +1,4 @@
-﻿function Get-MSIFIleInformation {
+﻿function Get-MSIFileInformation {
     param(
         [parameter(Mandatory = $true)]
 

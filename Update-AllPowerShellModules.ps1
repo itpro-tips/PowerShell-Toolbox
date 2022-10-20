@@ -8,7 +8,7 @@ param (
     # To include only these modules for the update process
     [String[]]$IncludedModules,
     [switch]$SkipPublisherCheck,
-    [boolean]$SimulationMode = $false
+    [switch]$SimulationMode
 )
 <#
 /!\/!\/!\ PLEASE READ /!\/!\/!\
@@ -30,8 +30,6 @@ If you have a module with two or more versions, the script delete them and reins
 #Requires -Version 5.0
 #Requires -RunAsAdministrator
 
-$script:SimulationMode = $SimulationMode
-
 Write-Host -ForegroundColor cyan 'Define PowerShell to add TLS1.2 in this session, needed since 1st April 2020 (https://devblogs.microsoft.com/powershell/powershell-gallery-tls-support/)'
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
@@ -40,7 +38,7 @@ Write-Host -ForegroundColor cyan 'Define PowerShell to add TLS1.2 in this sessio
 # Register-PSRepository -Default -ErrorAction SilentlyContinue
 # Set-PSRepository -Name PSGallery -InstallationPolicy trusted -ErrorAction SilentlyContinue
 
-if ($script:SimulationMode) {
+if ($SimulationMode) {
     Write-Host -ForegroundColor yellow 'Simulation mode is ON, nothing will be installed / removed / updated'
 }
 
@@ -57,7 +55,7 @@ function Remove-OldPowerShellModules {
 
         foreach ($oldVersion in $oldVersions) {
             Write-Host -ForegroundColor Cyan "$ModuleName - Uninstall previous version ($($oldVersion.Version))"
-            if (-not($script:SimulationMode)) {
+            if (-not($SimulationMode)) {
                 Remove-Module $ModuleName -ErrorAction SilentlyContinue
                 Uninstall-Module $oldVersion -Force  -ErrorAction Stop
             }
@@ -101,7 +99,7 @@ foreach ($module in $modules.Name) {
     if ($null -eq $currentVersion) {
         Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
 		
-        if (-not($script:SimulationMode)) {
+        if (-not($SimulationMode)) {
             try {
                 Install-Module -Name $module -Force -SkipPublisherCheck -ErrorAction Stop
             }
@@ -124,7 +122,7 @@ foreach ($module in $modules.Name) {
 
         if ($moduleGalleryInfo.Version -ne $currentVersion) {
             Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
-            if (-not($script:SimulationMode)) {
+            if (-not($SimulationMode)) {
                 try {
                     Install-Module -Name $module -Force -ErrorAction Stop
 
@@ -143,7 +141,7 @@ foreach ($module in $modules.Name) {
     elseif ([version]$currentVersion -lt [version]$moduleGalleryInfo.Version) {
         Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery from version $currentVersion to $($moduleGalleryInfo.Version)  Release date: $($moduleGalleryInfo.PublishedDate)" 
         
-        if (-not($script:SimulationMode)) {
+        if (-not($SimulationMode)) {
             try {
                 Update-Module -Name $module -Force -ErrorAction Stop
                 Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
