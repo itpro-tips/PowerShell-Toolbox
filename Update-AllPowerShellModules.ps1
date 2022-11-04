@@ -66,7 +66,7 @@ function Remove-OldPowerShellModules {
     }
 }
 
-if ($includedModules) {
+if ($IncludedModules) {
     $modules = Get-InstalledModule | Where-Object { $IncludedModules -contains $_.Name }
 }
 else {
@@ -76,6 +76,10 @@ else {
 foreach ($module in $modules.Name) {
     if ($ExcludedModules -contains $module) {
         Write-Host -ForegroundColor Yellow "Module $module is excluded from the update process"
+        continue
+    }
+    elseif ($module -like "$excludedModules") {
+        Write-Host -ForegroundColor Yellow "Module $module is excluded from the update process (match $excludeModules)"
         continue
     }
 
