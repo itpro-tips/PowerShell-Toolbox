@@ -143,7 +143,9 @@ foreach ($module in $modules.Name) {
         Write-Host -ForegroundColor Yellow "$module - the current version $currentVersion is newer than the version available on PowerShell Gallery $($moduleGalleryInfo.Version) (Release date: $($moduleGalleryInfo.PublishedDate)). Sometimes happens when you install a module from another repository or via .exe/.msi or if you change the version number manually."
     }
     elseif ([version]$currentVersion -lt [version]$moduleGalleryInfo.Version) {
-        Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery from version $currentVersion to $($moduleGalleryInfo.Version)  Release date: $($moduleGalleryInfo.PublishedDate)" 
+        Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery version " -NoNewline
+        Write-Host -ForegroundColor White "$currentVersion -> $($moduleGalleryInfo.Version)" -NoNewline 
+        Write-Host -ForegroundColor Cyan "- Release date: $($moduleGalleryInfo.PublishedDate)"
         
         if (-not($SimulationMode)) {
             try {
