@@ -144,7 +144,7 @@ foreach ($module in $modules.Name) {
     }
     elseif ([version]$currentVersion -lt [version]$moduleGalleryInfo.Version) {
         Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery version " -NoNewline
-        Write-Host -ForegroundColor White "$currentVersion -> $($moduleGalleryInfo.Version)" -NoNewline 
+        Write-Host -ForegroundColor White "$currentVersion -> $($moduleGalleryInfo.Version) " -NoNewline 
         Write-Host -ForegroundColor Cyan "- Release date: $($moduleGalleryInfo.PublishedDate)"
         
         if (-not($SimulationMode)) {
