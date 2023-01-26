@@ -62,10 +62,10 @@
         10 = 'EditTime'
         11 = 'LastPrinted'
         12 = 'CreationDate'
-        13 = 'Last Saved'
-        14 = 'Page Count'
-        15 = 'Word Count'
-        16 = 'Character Count'
+        13 = 'LastSaved'
+        14 = 'PageCount'
+        15 = 'WordCount'
+        16 = 'CharacterCount'
         18 = 'ApplicationName'
         19 = 'Security'
     }
@@ -120,7 +120,12 @@
     (1..$summaryInfoPropertiesCount) | ForEach-Object {
         $value = $SummaryInfo.GetType().InvokeMember("Property", "GetProperty", $Null, $SummaryInfo, $_)
 
-        $object | Add-Member -MemberType NoteProperty -Name $summaryInfoHashTable[$_] -Value $value
+        if ($null -eq $value) {
+            $object | Add-Member -MemberType NoteProperty -Name $summaryInfoHashTable[$_] -Value ''
+        }
+        else {
+            $object | Add-Member -MemberType NoteProperty -Name $summaryInfoHashTable[$_] -Value $value
+        }
     }
 
     #$msiDatabase.GetType().InvokeMember('Commit', 'InvokeMethod', $null, $msiDatabase, $null)
