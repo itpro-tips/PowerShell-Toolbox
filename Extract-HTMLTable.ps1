@@ -8,7 +8,7 @@ function Extract-HTMLTable {
 
         # Either we know the table number, otherwise we extract all tables
         [Parameter(Mandatory = $false)]
-        [boolean] $AllTables,
+        [switch] $AllTables,
 
         [Parameter(Mandatory = $false)]
         [boolean] $LocalFile
