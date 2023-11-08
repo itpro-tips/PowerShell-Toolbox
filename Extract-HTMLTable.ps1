@@ -41,9 +41,12 @@ function Extract-HTMLTable {
     }
 
     ## Go through all of the rows in the table
+    $tableNumber = 0
     foreach ($table in $tables) {
         $titles = @()
         $rows = @($table.Rows)
+
+        $tableNumber++
 
         foreach ($row in $rows) {
             $cells = @($row.Cells)
@@ -62,11 +65,13 @@ function Extract-HTMLTable {
             ## Now go through the cells in the the row. For each, try to find the
             ## title that represents that column and create a hashtable mapping those
             ## titles to content
-            $resultObject = [Ordered] @{}
+            $resultObject = [Ordered] @{
+                "TableNumber" = $tableNumber
+            }
+
             for ($counter = 0; $counter -lt $cells.Count; $counter++) {
                 $title = $titles[$counter]
                 if (-not $title) { continue }  
-
                 $resultObject[$title] = ('' + $cells[$counter].InnerText).Trim()
             }
 
