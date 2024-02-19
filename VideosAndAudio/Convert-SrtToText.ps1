@@ -1,4 +1,4 @@
-# I have a sert file and i would like to supress timetastamp and number to keep texte only*
+# I have a srt file and i would like to supress timetastamp and number to keep texte only*
 # 612
 # 00:52:23,360 --> 00:52:26,160
 Param(
