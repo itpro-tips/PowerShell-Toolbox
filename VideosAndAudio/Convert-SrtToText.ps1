@@ -1,5 +1,5 @@
-# I have a srt file and i would like to supress timetastamp and number to keep texte only*
-# 612
+# format is:
+# <incremental id>
 # 00:52:23,360 --> 00:52:26,160
 Param(
     [Parameter(Mandatory = $false)]
