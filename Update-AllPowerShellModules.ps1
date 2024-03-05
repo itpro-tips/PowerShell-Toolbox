@@ -13,7 +13,7 @@ param (
 <#
 /!\/!\/!\ PLEASE READ /!\/!\/!\
 
-/!\     If you look for a quick way to update, please keep in mind Microsoft has a built-in CMDlzt to update ALL the PowerShell modules installed:
+/!\     If you look for a quick way to update, please keep in mind Microsoft has a built-in CMDlet to update ALL the PowerShell modules installed:
 /!\     Update-Module [-Verbose]
 
 /!\     This script is intended as a replacement of the Update-Module:
@@ -100,8 +100,12 @@ foreach ($module in $modules.Name) {
         Write-Warning "$module not found in the PowerShell Gallery. $($_.Exception.Message)"
     }
 	
+    # Convert published date to YYYY/MM/DD HH:MM:SS format
+    $publishedDate = [datetime]$moduleGalleryInfo.PublishedDate
+    $publishedDate = $publishedDate.ToString("yyyy/MM/dd HH:mm:ss")
+
     if ($null -eq $currentVersion) {
-        Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
+        Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $publishedDate"
 		
         if (-not($SimulationMode)) {
             try {
@@ -113,7 +117,7 @@ foreach ($module in $modules.Name) {
         }
     }
     elseif ($moduleGalleryInfo.Version -eq $currentVersion) {
-        Write-Host -ForegroundColor Green "$module already in latest version: $currentVersion - Release date: $($moduleGalleryInfo.PublishedDate)"
+        Write-Host -ForegroundColor Green "$module already in latest version: $currentVersion - Release date: $publishedDate"
     }
     elseif ($currentVersion.count -gt 1) {
         Write-Host -ForegroundColor Yellow "$module is installed in $($currentVersion.count) versions (versions: $($currentVersion -join ' | '))"
@@ -125,7 +129,8 @@ foreach ($module in $modules.Name) {
         $currentVersion = (Get-InstalledModule -Name $module).Version
 
         if ($moduleGalleryInfo.Version -ne $currentVersion) {
-            Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
+            Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $publishedDate"  
+
             if (-not($SimulationMode)) {
                 try {
                     Install-Module -Name $module -Force -ErrorAction Stop
@@ -140,12 +145,12 @@ foreach ($module in $modules.Name) {
     }
     # https://invoke-thebrain.com/2018/12/comparing-version-numbers-powershell/
     elseif ([version]$currentVersion -gt [version]$moduleGalleryInfo.Version) {   
-        Write-Host -ForegroundColor Yellow "$module - the current version $currentVersion is newer than the version available on PowerShell Gallery $($moduleGalleryInfo.Version) (Release date: $($moduleGalleryInfo.PublishedDate)). Sometimes happens when you install a module from another repository or via .exe/.msi or if you change the version number manually."
+        Write-Host -ForegroundColor Yellow "$module - the current version $currentVersion is newer than the version available on PowerShell Gallery $($moduleGalleryInfo.Version) (Release date: $publishedDate). Sometimes happens when you install a module from another repository or via .exe/.msi or if you change the version number manually."
     }
     elseif ([version]$currentVersion -lt [version]$moduleGalleryInfo.Version) {
         Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery version " -NoNewline
         Write-Host -ForegroundColor White "$currentVersion -> $($moduleGalleryInfo.Version) " -NoNewline 
-        Write-Host -ForegroundColor Cyan "- Release date: $($moduleGalleryInfo.PublishedDate)"
+        Write-Host -ForegroundColor Cyan "- Release date: $publishedDate"
         
         if (-not($SimulationMode)) {
             try {
@@ -158,7 +163,7 @@ foreach ($module in $modules.Name) {
                 
                     if ($SkipPublisherCheck.IsPresent) {
                         Write-Host -ForegroundColor Cyan "$module - SkipPublisherCheck Parameter is present, so install will run without Authenticode check"
-                        Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $($moduleGalleryInfo.PublishedDate)"  
+                        Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $publishedDate"
                         try {
                             Install-Module -Name $module -Force -SkipPublisherCheck
                         }
