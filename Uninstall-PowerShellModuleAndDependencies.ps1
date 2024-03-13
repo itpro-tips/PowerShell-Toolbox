@@ -43,11 +43,11 @@ function Uninstall-PowerShellModuleAndDependencies {
 
     Get-RecursivePowerShellDepencies -Module $Module
 
-    foreach ($modulesOrDependency in $modulesOrDependencies) {
-        Write-Host "$modulesOrDependency - Uninstalling" -ForegroundColor Cyan
+    foreach ($mod in $modulesOrDependencies) {
+        Write-Host "$mod - Uninstalling" -ForegroundColor Cyan
 
         try {
-            #Uninstall-Module -Name $module.name -Force -ErrorAction Stop
+            Uninstall-Module -Name $mod -Force -ErrorAction Stop
         }
         catch {
             Write-Warning "modulesOrDependency $($_.Exception.Message)"
