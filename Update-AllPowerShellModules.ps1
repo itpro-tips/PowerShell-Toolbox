@@ -67,7 +67,7 @@ function Remove-OldPowerShellModules {
 }
 
 if ($IncludedModules) {
-    $modules = Get-InstalledModule | Where-Object { $IncludedModules -contains $_.Name }
+    $modules = Get-InstalledModule | Where-Object { $_.Name -like $IncludedModules}
 }
 else {
     $modules = Get-InstalledModule
@@ -98,8 +98,22 @@ foreach ($module in $modules.Name) {
     }
     catch {
         Write-Warning "$module not found in the PowerShell Gallery. $($_.Exception.Message)"
+        continue
     }
 	
+    # $current version can also be a version follow by -preview
+    if ($currentVersion -like '*-preview') {
+        Write-Warning "The module installed is a preview version, it will not tested by this script"
+    }
+
+    if ($moduleGalleryInfo.Version -like '*-preview') {
+        Write-Warning "The module in PowerShell Gallery is a preview version, it will not tested bt this script"
+        continue
+    }
+    else {
+        $moduleGalleryVersion = $moduleGalleryInfo.Version
+    }
+
     # Convert published date to YYYY/MM/DD HH:MM:SS format
     $publishedDate = [datetime]$moduleGalleryInfo.PublishedDate
     $publishedDate = $publishedDate.ToString("yyyy/MM/dd HH:mm:ss")
@@ -128,7 +142,7 @@ foreach ($module in $modules.Name) {
         # Check again the current Version as we uninstalled some old versions
         $currentVersion = (Get-InstalledModule -Name $module).Version
 
-        if ($moduleGalleryInfo.Version -ne $currentVersion) {
+        if ($moduleGalleryVersion -ne $currentVersion) {
             Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $publishedDate"  
 
             if (-not($SimulationMode)) {
@@ -144,10 +158,10 @@ foreach ($module in $modules.Name) {
         }
     }
     # https://invoke-thebrain.com/2018/12/comparing-version-numbers-powershell/
-    elseif ([version]$currentVersion -gt [version]$moduleGalleryInfo.Version) {   
+    elseif ([version]$currentVersion -gt [version]$moduleGalleryVersion) {   
         Write-Host -ForegroundColor Yellow "$module - the current version $currentVersion is newer than the version available on PowerShell Gallery $($moduleGalleryInfo.Version) (Release date: $publishedDate). Sometimes happens when you install a module from another repository or via .exe/.msi or if you change the version number manually."
     }
-    elseif ([version]$currentVersion -lt [version]$moduleGalleryInfo.Version) {
+    elseif ([version]$currentVersion -lt [version]$moduleGalleryVersion) {
         Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery version " -NoNewline
         Write-Host -ForegroundColor White "$currentVersion -> $($moduleGalleryInfo.Version) " -NoNewline 
         Write-Host -ForegroundColor Cyan "- Release date: $publishedDate"
