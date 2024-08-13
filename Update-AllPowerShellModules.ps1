@@ -42,8 +42,6 @@ if ($SimulationMode) {
     Write-Host -ForegroundColor yellow 'Simulation mode is ON, nothing will be installed / removed / updated'
 }
 
-Write-Host -ForegroundColor Cyan 'Get all PowerShell modules'
-
 function Remove-OldPowerShellModules {
     param (
         [string]$ModuleName,
@@ -67,9 +65,11 @@ function Remove-OldPowerShellModules {
 }
 
 if ($IncludedModules) {
+    Write-Host -ForegroundColor Cyan "Get PowerShell modules like $IncludedModules"
     $modules = Get-InstalledModule | Where-Object { $_.Name -like $IncludedModules}
 }
 else {
+    Write-Host -ForegroundColor Cyan 'Get all PowerShell modules'
     $modules = Get-InstalledModule
 }
 
