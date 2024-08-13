@@ -52,7 +52,9 @@ function Remove-OldPowerShellModules {
         $oldVersions = Get-InstalledModule -Name $ModuleName -AllVersions -ErrorAction Stop | Where-Object { $_.Version -ne $GalleryVersion }
 
         foreach ($oldVersion in $oldVersions) {
-            Write-Host -ForegroundColor Cyan "$ModuleName - Uninstall previous version ($($oldVersion.Version))"
+            Write-Host -ForegroundColor Cyan "$ModuleName - Uninstall previous version" -NoNewline
+            Write-Host -ForegroundColor White " ($($oldVersion.Version))"
+
             if (-not($SimulationMode)) {
                 Remove-Module $ModuleName -ErrorAction SilentlyContinue
                 Uninstall-Module $oldVersion -Force  -ErrorAction Stop
@@ -66,7 +68,7 @@ function Remove-OldPowerShellModules {
 
 if ($IncludedModules) {
     Write-Host -ForegroundColor Cyan "Get PowerShell modules like $IncludedModules"
-    $modules = Get-InstalledModule | Where-Object { $_.Name -like $IncludedModules}
+    $modules = Get-InstalledModule | Where-Object { $_.Name -like $IncludedModules }
 }
 else {
     Write-Host -ForegroundColor Cyan 'Get all PowerShell modules'
@@ -131,11 +133,16 @@ foreach ($module in $modules.Name) {
         }
     }
     elseif ($moduleGalleryInfo.Version -eq $currentVersion) {
-        Write-Host -ForegroundColor Green "$module already in latest version: $currentVersion - Release date: $publishedDate"
+        Write-Host -ForegroundColor Green "$module - already in latest version: " -NoNewline
+        Write-Host -ForegroundColor White "$currentVersion" -NoNewline 
+        Write-Host -ForegroundColor Green " - Release date:" -NoNewline
+        Write-Host -ForegroundColor White " $publishedDate"
     }
     elseif ($currentVersion.count -gt 1) {
-        Write-Host -ForegroundColor Yellow "$module is installed in $($currentVersion.count) versions (versions: $($currentVersion -join ' | '))"
-        Write-Host -ForegroundColor Cyan "$module - Uninstall previous $module version(s) below the latest version ($($moduleGalleryInfo.Version))"
+        Write-Host -ForegroundColor Yellow "$module is installed in $($currentVersion.count) versions:" -NoNewline
+        Write-Host -ForegroundColor White " $($currentVersion -join ' | ')"
+        Write-Host -ForegroundColor Cyan "$module - Uninstall previous $module version(s) below the latest version" -NoNewline
+        Write-Host -ForegroundColor White " ($($moduleGalleryInfo.Version))"
         
         Remove-OldPowerShellModules -ModuleName $module -GalleryVersion $moduleGalleryInfo.Version
 
@@ -143,7 +150,10 @@ foreach ($module in $modules.Name) {
         $currentVersion = (Get-InstalledModule -Name $module).Version
 
         if ($moduleGalleryVersion -ne $currentVersion) {
-            Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version $($moduleGalleryInfo.Version) - Release date: $publishedDate"  
+            Write-Host -ForegroundColor Cyan "$module - Install from PowerShellGallery version" -NoNewline
+            Write-Host -ForegroundColor White " $($moduleGalleryInfo.Version)" -NoNewline
+            Write-Host -ForegroundColor Cyan " - Release date:" -NoNewline
+            Write-Host -ForegroundColor White " $publishedDate"
 
             if (-not($SimulationMode)) {
                 try {
@@ -162,9 +172,10 @@ foreach ($module in $modules.Name) {
         Write-Host -ForegroundColor Yellow "$module - the current version $currentVersion is newer than the version available on PowerShell Gallery $($moduleGalleryInfo.Version) (Release date: $publishedDate). Sometimes happens when you install a module from another repository or via .exe/.msi or if you change the version number manually."
     }
     elseif ([version]$currentVersion -lt [version]$moduleGalleryVersion) {
-        Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery version " -NoNewline
-        Write-Host -ForegroundColor White "$currentVersion -> $($moduleGalleryInfo.Version) " -NoNewline 
-        Write-Host -ForegroundColor Cyan "- Release date: $publishedDate"
+        Write-Host -ForegroundColor Cyan "$module - Update from PowerShellGallery version" -NoNewline
+        Write-Host -ForegroundColor White " $currentVersion -> $($moduleGalleryInfo.Version)" -NoNewline 
+        Write-Host -ForegroundColor Cyan " - Release date:" -NoNewline
+        Write-Host -ForegroundColor White " $publishedDate"
         
         if (-not($SimulationMode)) {
             try {
